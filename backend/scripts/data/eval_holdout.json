@@ -1,0 +1,162 @@
+[
+  {
+    "source": "email",
+    "raw_text": "vendor evaluation ME61 scoring criteria needs update. process improvement request",
+    "reporter": "Naresh Mehta",
+    "environment": "QAS",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "email",
+    "raw_text": "request to add custom field in vendor master for GST registration number. future requirement",
+    "reporter": "Usha Desai",
+    "environment": "DEV",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "email",
+    "raw_text": "payment advice email format needs logo and company address. cosmetic change only",
+    "reporter": "Ajay Reddy",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "chat",
+    "raw_text": "proxy class in PI not updated after IDOC extension. need to regenerate proxy after segment change",
+    "reporter": "Smita Pandey",
+    "environment": "DEV",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "SE38 ABAP editor not allowing save for one developer. authorization or lock issue",
+    "reporter": "Sudha Desai",
+    "environment": "DEV",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "MIRO invoice verification showing tax calculation error. Vendor Sharma Electronics bill for 5 lakh stuck. Already 3 days pending",
+    "reporter": "Suresh Iyer",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "MIRO 3-way match failing. invoice amount matches PO but system not allowing posting. ME 573 error",
+    "reporter": "Vijay Reddy",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "customer master XD01 creation giving error on account group validation. new customer onboarding delayed",
+    "reporter": "Neha Desai",
+    "environment": "QAS",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "bank reconciliation FF67 not posting. file uploaded but no entries coming",
+    "reporter": "Rekha Shah",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "pricing condition PR00 wrong in VA01. customer getting 15% less price than agreed. contract issue",
+    "reporter": "Rajesh Pandey",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "jira",
+    "raw_text": "PI message reprocessing SXMB_MONI taking very long. 1000 messages in queue piling up",
+    "reporter": "Rajesh Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "FB50 posting gives warning message about document type. posting works but warning confusing users",
+    "reporter": "Pallavi Iyer",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "cost center KS01 creation giving authorization error for some users. workaround is to use super user",
+    "reporter": "Rahul Shah",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "FI document number range running low for current year. need to extend for next year planning",
+    "reporter": "Rajesh Singh",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "jira",
+    "raw_text": "SAP not opening for anyone. SM21 showing memory overflow errors. business stopped",
+    "reporter": "Sudha Chaudhari",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "phone",
+    "raw_text": "SM21 showing lot of errors. system performance very slow today everyone complaining since morning",
+    "reporter": "Rahul Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "user exit in ME21N not triggering since recent transport. custom validations skipped",
+    "reporter": "Meena Reddy",
+    "environment": "PRD",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "entire FI module down. nobody can post any document since 9am. production system. please escalate",
+    "reporter": "Usha Kumar",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "phone",
+    "raw_text": "profit center assignment wrong on automatic posting. not urgent but needs fix",
+    "reporter": "Meena Chaudhari",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "XIAdapter error on PI/PO system. No data flowing to any external system since last night. All integrations down",
+    "reporter": "Amit Desai",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P1"
+  }
+]

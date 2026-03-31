@@ -1,0 +1,642 @@
+[
+  {
+    "source": "email",
+    "raw_text": "STRUST certificate expiring next month. need to renew. not urgent but planned",
+    "reporter": "Kishore Shah",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "SM36 scheduled job not triggering at correct time. off by 30 mins. daylight saving issue maybe",
+    "reporter": "Divya Tiwari",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "ABAP dump in ZMMSTOCK_REPORT every time it runs. production users cannot get inventory data",
+    "reporter": "Meena Iyer",
+    "environment": "PRD",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "email",
+    "raw_text": "asset transfer ABUMN giving F5 702 error. need to move assets before quarter close",
+    "reporter": "Lata Reddy",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "VF01 billing run completely stopped V1 801 error. cannot invoice any customer. revenue blocked",
+    "reporter": "Rajesh Kumar",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "jira",
+    "raw_text": "ME21N purchase order creation completely failing M7 021 error. procurement blocked. vendor waiting",
+    "reporter": "Anita Tiwari",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "chat",
+    "raw_text": "payment run F110 failed completely. All vendor payments stuck since 6am. Finance director is asking. Please help immediately",
+    "reporter": "Sanjay Joshi",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "phone",
+    "raw_text": "billing output VF02 not sending to customer. EDI integration stopped. VN 008 error in message log",
+    "reporter": "Divya Mehta",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "FBL1N vendor line item report very slow. taking 10 mins to load for old data",
+    "reporter": "Kavita Joshi",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "need customer-wise sales report with YTD comparison. current standard reports not sufficient",
+    "reporter": "Pallavi Malhotra",
+    "environment": "DEV",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "sales order VB01 - contract determination not picking correct contract for customer",
+    "reporter": "Girish Tiwari",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "GR/IR clearing account showing huge open items. FK10N reconciliation not matching",
+    "reporter": "Shreya Pandey",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "chat",
+    "raw_text": "inventory valuation CKMVFM giving error during period close. MM closing blocked",
+    "reporter": "Sudha Patil",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "material master MM01 creation blocked. plant extension not saving. new product launch delayed",
+    "reporter": "Ramesh Iyer",
+    "environment": "QAS",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "chat",
+    "raw_text": "VA05 open order report not showing correct status. some orders showing open when already delivered",
+    "reporter": "Kavita Desai",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "SCOT email configuration not sending output. print preview works but email fails",
+    "reporter": "Anil Kulkarni",
+    "environment": "QAS",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "system monitoring dashboard CCMS showing yellow alerts. not critical but needs investigation",
+    "reporter": "Rajesh Pandey",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "email",
+    "raw_text": "enhancement spot in VL01N throwing dump after EHP upgrade. delivery creation failing",
+    "reporter": "Sandeep Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "chat",
+    "raw_text": "packing instruction in VL01N not defaulting. warehouse team has to manually enter each time",
+    "reporter": "Sandeep Malhotra",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "system gets slow after lunch when 50 plus users login simultaneously. response time unacceptable",
+    "reporter": "Meena Verma",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "production system completely down. ST22 showing ABAP_RUNTIME_ERROR every minute. all users locked out. CRITICAL",
+    "reporter": "Ramesh Pandey",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "document splitting configuration not working for one company code. other company codes fine",
+    "reporter": "Vivek Shah",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "database tablespace full. system going into emergency mode. all operations halted",
+    "reporter": "Priya Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "chat",
+    "raw_text": "performance issue in custom report ZFBCUST. 50000 records taking 30 minutes. needs optimization",
+    "reporter": "Asha Nair",
+    "environment": "PRD",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "SXMB_MONI showing 500 failed IDocs. ClearTax GST integration completely stopped. compliance at risk",
+    "reporter": "Lata Kumar",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "need to increase dialog work processes from 20 to 25. performance improvement request",
+    "reporter": "Deepa Mishra",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "SXI_MONITOR showing failed messages for bank integration. automatic payment reconciliation stopped",
+    "reporter": "Ramesh Joshi",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "FB50 screen layout needs to show additional field for reference. customization request",
+    "reporter": "Nitin Reddy",
+    "environment": "DEV",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "email",
+    "raw_text": "mapping error in interface Z_FI_BANK_STATEMENT. some fields not mapping correctly to target structure",
+    "reporter": "Rajesh Pandey",
+    "environment": "QAS",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "SM50 showing 80 work processes all occupied. system very slow. users timing out",
+    "reporter": "Pallavi Rao",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "dunning run failed. customer statements not sent. accounts receivable team blocked",
+    "reporter": "Manoj Desai",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "jira",
+    "raw_text": "request to create new development client for upcoming project. planning activity",
+    "reporter": "Usha Kulkarni",
+    "environment": "DEV",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "phone",
+    "raw_text": "ME2N outstanding PO report very slow. filter by vendor taking 15 minutes",
+    "reporter": "Ajay Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "need custom report for slow-moving inventory. standard MB52 not sufficient. enhancement request",
+    "reporter": "Sanjay Mehta",
+    "environment": "DEV",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "chat",
+    "raw_text": "VL02N delivery change not allowed. locked by another user but that user already logged out",
+    "reporter": "Priya Kumar",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "client copy taking very long. been running 8 hours. should finish in 2 hours normally",
+    "reporter": "Sanjay Kumar",
+    "environment": "DEV",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "custom smartform ZSD_INVOICE layout broken after print workbench change. minor cosmetic issue",
+    "reporter": "Rahul Mehta",
+    "environment": "QAS",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "MB1A goods issue M8 108 error. production line waiting for material. 200 workers idle",
+    "reporter": "Sanjay Mehta",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "BizTalk adapter not connecting to PI system. middleware team says PI side issue. certificates maybe",
+    "reporter": "Seema Mehta",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "withholding tax certificate RFWT0010 report showing wrong amounts. compliance issue",
+    "reporter": "Lata Iyer",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "jira",
+    "raw_text": "background job RFFOUS_C for payment medium stuck since yesterday. Finance waiting for output",
+    "reporter": "Rekha Reddy",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "tax code V1 in FB60 not calculating TDS correctly for one vendor category",
+    "reporter": "Kishore Kumar",
+    "environment": "DEV",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "SU01 user creation giving authorization error. new joiner cannot get access. IT team blocked",
+    "reporter": "Lata Mishra",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "PFCG role modification not saving. need to update authorization for month end team",
+    "reporter": "Manoj Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "FAGLL03 GL account line item display not showing correct balance. might be display issue",
+    "reporter": "Pallavi Verma",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "VA01 sales order not saving for any customer. system error. all sales operations stopped",
+    "reporter": "Hemant Kulkarni",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "material movement type 101 posting but reservation not getting cleared automatically",
+    "reporter": "Vijay Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "source list ME01 not restricting vendors properly. users able to select unapproved vendor",
+    "reporter": "Seema Gupta",
+    "environment": "QAS",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "recurring entry FBD1 not generating for this month. accrual entries missing. auditors will ask",
+    "reporter": "Manoj Rao",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "ST22 runtime dump TIME_OUT happening every 5 mins. background jobs failing. batch processing stopped",
+    "reporter": "Ajay Joshi",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "jira",
+    "raw_text": "SE80 - need to create new Z-package for upcoming project. code organization request",
+    "reporter": "Pooja Iyer",
+    "environment": "DEV",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "jira",
+    "raw_text": "SM12 lock entries piling up. users getting locked. need to clear old entries",
+    "reporter": "Lata Mehta",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "asset depreciation run failed AA 500 error in production. Month end closing in 2 hours cannot wait",
+    "reporter": "Sudha Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "goods receipt not posting for any PO. MIGO throwing system error. warehouse operations stopped",
+    "reporter": "Ramesh Patil",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "accounting team saying something wrong with journal entries cant post anything since 10am in quality system",
+    "reporter": "Lata Singh",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "STMS transport import failing with error. urgent config change stuck in queue",
+    "reporter": "Divya Mishra",
+    "environment": "QAS",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "purchasing info record ME11 price not updating from last PO. manual override needed each time",
+    "reporter": "Nandini Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "customer credit block VKM3 not releasing. credit limit is fine in FD32 but still blocking. Sharma Steel order held for 2 days",
+    "reporter": "Girish Patil",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "jira",
+    "raw_text": "intercompany posting IC01 not creating mirror entry in second company code automatically",
+    "reporter": "Rajesh Kulkarni",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "chat",
+    "raw_text": "batch management classification not assigning correctly on goods receipt. manual correction needed",
+    "reporter": "Pallavi Reddy",
+    "environment": "DEV",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "jira",
+    "raw_text": "FBL5N customer line items report not pulling closed items. filter issue maybe",
+    "reporter": "Meena Rao",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "chat",
+    "raw_text": "f-02 manual journal entry not posting. error says posting period not open. closing is friday",
+    "reporter": "Rekha Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "FB60 vendor invoice posting giving dump. works in QAS but not in production. Strange",
+    "reporter": "Ramesh Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "chat",
+    "raw_text": "VL01N delivery creation blocked. ATP check failing for all orders. shipping team idle",
+    "reporter": "Sunita Sharma",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "IDoc processing failing IDOC_ERROR. 200 outbound messages queued. Tally integration stopped",
+    "reporter": "Nitin Pandey",
+    "environment": "PRD",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "phone",
+    "raw_text": "vendor payment terms not defaulting correctly on MIRO. user has to manually enter each time",
+    "reporter": "Anil Sharma",
+    "environment": "QAS",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "sales order form layout needs to include GST number field. regulatory requirement for future",
+    "reporter": "Deepa Singh",
+    "environment": "DEV",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "SAP not opening for some users in Pune office. other offices fine. network or basis issue",
+    "reporter": "Vivek Mehta",
+    "environment": "PRD",
+    "ground_truth_module": "BASIS",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "email",
+    "raw_text": "custom report ZFI_AGING crashing with SYNTAX_ERROR after transport to production. All FI reports down",
+    "reporter": "Nandini Gupta",
+    "environment": "PRD",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "phone",
+    "raw_text": "currency revaluation FAGL_FC_VAL giving warning for some accounts. no hard error just concern",
+    "reporter": "Lata Kumar",
+    "environment": "DEV",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "FB50 posting not working, getting F5 301 error in production. Year end closing is tomorrow. URGENT!",
+    "reporter": "Amit Malhotra",
+    "environment": "PRD",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P1"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "ABAP dump in ZMMREPORT after latest transport to QAS. error in new enhancement. DEV works fine",
+    "reporter": "Hemant Kumar",
+    "environment": "QAS",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "phone",
+    "raw_text": "MB52 stock report not matching physical count. small discrepancy. need reconciliation",
+    "reporter": "Bhavna Shah",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P3"
+  },
+  {
+    "source": "chat",
+    "raw_text": "custom BAPI Z_CREATE_VENDOR not returning correct data after last code change. mass vendor creation broken",
+    "reporter": "Rekha Shah",
+    "environment": "QAS",
+    "ground_truth_module": "ABAP",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "PO approval workflow stuck for all purchase orders since yesterday evening. approvers not getting email",
+    "reporter": "Rajesh Tiwari",
+    "environment": "PRD",
+    "ground_truth_module": "MM",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "need new interface from SAP to CRM system for customer master sync. scoping activity only",
+    "reporter": "Asha Kulkarni",
+    "environment": "DEV",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "chat",
+    "raw_text": "need new report showing vendor aging with payment terms. not urgent just enhancement",
+    "reporter": "Ravi Patil",
+    "environment": "DEV",
+    "ground_truth_module": "FI",
+    "ground_truth_priority": "P4"
+  },
+  {
+    "source": "jira",
+    "raw_text": "returns order RE01 not creating credit memo automatically. manual processing for 50 returns pending",
+    "reporter": "Smita Kumar",
+    "environment": "QAS",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "whatsapp",
+    "raw_text": "ORDERS05 IDOC to vendor portal failing since ECC upgrade. EDI orders not reaching suppliers",
+    "reporter": "Ravi Reddy",
+    "environment": "QAS",
+    "ground_truth_module": "PI_PO",
+    "ground_truth_priority": "P2"
+  },
+  {
+    "source": "email",
+    "raw_text": "SD billing split happening when it should not. single delivery getting split into 2 invoices",
+    "reporter": "Sandeep Iyer",
+    "environment": "PRD",
+    "ground_truth_module": "SD",
+    "ground_truth_priority": "P3"
+  }
+]

@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AI-Powered Incident Triage Design System
+   Clean, minimal, enterprise-grade */
+
+@layer base {
+  :root {
+    /* Base Canvas */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    /* Cards & Surfaces */
+    --card: 210 20% 98%;
+    --card-foreground: 222 47% 11%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - Light Blue #58A6FF */
+    --primary: 212 100% 67%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Muted Navy #1E3A8A */
+    --secondary: 224 76% 33%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent */
+    --accent: 210 20% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Destructive - Red for P1 */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Priority Colors */
+    --priority-p1: 0 72% 57%;
+    --priority-p2: 28 92% 50%;
+    --priority-p3: 43 96% 65%;
+    --priority-p4: 215 14% 64%;
+
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --warning: 28 92% 50%;
+    --info: 212 100% 67%;
+
+    /* Source Colors */
+    --source-whatsapp: 142 70% 45%;
+    --source-jira: 212 100% 50%;
+    --source-email: 262 83% 58%;
+    --source-phone: 215 14% 50%;
+
+    /* Confidence */
+    --confidence-high: 142 76% 36%;
+    --confidence-medium: 43 96% 50%;
+    --confidence-low: 0 72% 57%;
+
+    /* Borders */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 212 100% 67%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar */
+    --sidebar-background: 224 76% 33%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 212 100% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 224 76% 40%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 224 76% 40%;
+    --sidebar-ring: 212 100% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h2 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-lg font-medium;
+  }
+}
+
+@layer components {
+  /* KPI Card */
+  .kpi-card {
+    @apply bg-card rounded-lg p-4 border border-border/50 shadow-sm;
+  }
+
+  /* Priority Pills */
+  .priority-p1 {
+    @apply bg-[hsl(var(--priority-p1))] text-white;
+  }
+  .priority-p2 {
+    @apply bg-[hsl(var(--priority-p2))] text-white;
+  }
+  .priority-p3 {
+    @apply bg-[hsl(var(--priority-p3))] text-foreground;
+  }
+  .priority-p4 {
+    @apply bg-[hsl(var(--priority-p4))] text-white;
+  }
+
+  /* Source Badges */
+  .source-whatsapp {
+    @apply bg-[hsl(var(--source-whatsapp))] text-white;
+  }
+  .source-jira {
+    @apply bg-[hsl(var(--source-jira))] text-white;
+  }
+  .source-email {
+    @apply bg-[hsl(var(--source-email))] text-white;
+  }
+  .source-phone {
+    @apply bg-[hsl(var(--source-phone))] text-white;
+  }
+  .source-chat {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Confidence Indicators */
+  .confidence-high {
+    @apply text-[hsl(var(--confidence-high))];
+  }
+  .confidence-medium {
+    @apply text-[hsl(var(--confidence-medium))];
+  }
+  .confidence-low {
+    @apply text-[hsl(var(--confidence-low))];
+  }
+
+  /* Status Dots */
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+  .status-dot-success {
+    @apply bg-[hsl(var(--success))];
+  }
+  .status-dot-warning {
+    @apply bg-[hsl(var(--warning))];
+  }
+  .status-dot-error {
+    @apply bg-[hsl(var(--destructive))];
+  }
+
+  /* Filter Chips */
+  /* Filter Chips */
+  .filter-chip {
+    @apply px-2.5 py-1 text-xs rounded-md border border-border/60 bg-background 
+           hover:bg-muted hover:border-border transition-all cursor-pointer inline-flex items-center gap-1.5 font-medium;
+  }
+  .filter-chip-active {
+    @apply bg-primary text-primary-foreground border-primary hover:bg-primary/90;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

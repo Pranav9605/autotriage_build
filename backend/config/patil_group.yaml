@@ -1,0 +1,67 @@
+tenant_id: "patil_group"
+display_name: "Patil Group"
+modules_active:
+  - FI
+  - MM
+  - SD
+  - PP
+  - BASIS
+  - ABAP
+  - PI_PO
+teams:
+  FI: "SAP Finance Team"
+  MM: "SAP MM/Procurement Team"
+  SD: "SAP SD/Sales Team"
+  PP: "SAP PP/Production Team"
+  BASIS: "BASIS/Infrastructure Team"
+  ABAP: "ABAP Development Team"
+  PI_PO: "Integration Team"
+  DEFAULT: "General SAP Support"
+hard_rules:
+  - name: "ABAP in production is always P1"
+    condition:
+      module: "ABAP"
+      environment: "PRD"
+    override:
+      priority: "P1"
+      manual_review_required: true
+      review_reason: "rule_triggered"
+  - name: "F5 errors route to Finance"
+    condition:
+      error_code_prefix: "F5"
+    override:
+      module: "FI"
+      assign_to: "SAP Finance Team"
+  - name: "WhatsApp low-confidence needs review"
+    condition:
+      source: "whatsapp"
+      confidence_below: 0.70
+    override:
+      manual_review_required: true
+      review_reason: "low_confidence_whatsapp"
+  - name: "PRD critical gets escalation"
+    condition:
+      environment: "PRD"
+      priority_in:
+        - "P1"
+        - "P2"
+    override:
+      manual_review_required: true
+      review_reason: "production_critical"
+escalation:
+  p1_sla_minutes: 30
+  p2_sla_minutes: 240
+  p3_sla_minutes: 1440
+  p4_sla_minutes: 4320
+  p1_outside_hours: "page_oncall"
+  sla_breach_action: "escalate_to_manager"
+ai_config:
+  confidence_threshold: 0.80
+  local_model_enabled: false
+  local_model_threshold: 0.90
+  llm_provider: "anthropic"
+  llm_model: "claude-sonnet-4-20250514"
+  embedding_model: "text-embedding-3-small"
+  max_similar_tickets: 3
+  max_kb_articles: 3
+  similarity_min_score: 0.78
