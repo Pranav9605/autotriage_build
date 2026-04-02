@@ -1,20 +1,51 @@
-"""Tickets API — create + list + get."""
+"""Tickets API — create + list + get + SSE stream."""
 
+import asyncio
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sse_starlette.sse import EventSourceResponse
+
 from app.dependencies import get_db, get_intake_service, get_tenant_id
 from app.models.ticket import Ticket
 from app.models.triage_decision import TriageDecision
 from app.schemas.ticket import TicketCreate, TicketListResponse, TicketResponse
 from app.schemas.triage import TriageResponse
 from app.services.intake import IntakeService
+from app import sse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/tickets", tags=["tickets"])
+
+
+@router.get("/stream")
+async def stream_tickets(
+    request: Request,
+    tenant_id: str = Depends(get_tenant_id),
+):
+    """Server-Sent Events stream — emits ticket_created, ticket_triaged, feedback_received."""
+
+    async def event_generator():
+        q = sse.register()
+        try:
+            # Initial ping so the client knows the connection is live
+            yield {"event": "connected", "data": f'{{"tenant_id": "{tenant_id}"}}'}
+            while True:
+                if await request.is_disconnected():
+                    break
+                try:
+                    payload = await asyncio.wait_for(q.get(), timeout=15.0)
+                    yield {"event": "message", "data": payload}
+                except asyncio.TimeoutError:
+                    # Keepalive comment
+                    yield {"event": "ping", "data": "{}"}
+        finally:
+            sse.unregister(q)
+
+    return EventSourceResponse(event_generator())
 
 
 @router.post("", response_model=TicketResponse, status_code=201)
@@ -39,8 +70,17 @@ async def create_ticket(
         )
     )
     ticket = result.scalar_one()
+    response = _ticket_to_response(ticket, triage)
 
-    return _ticket_to_response(ticket, triage)
+    await sse.broadcast("ticket_triaged", {
+        "ticket_id": triage.ticket_id,
+        "module": triage.module,
+        "priority": triage.priority,
+        "source": body.source,
+        "tenant_id": tenant_id,
+    })
+
+    return response
 
 
 @router.get("", response_model=TicketListResponse)
@@ -54,7 +94,6 @@ async def list_tickets(
     page_size: int = Query(20, ge=1, le=100),
 ):
     """List tickets for the tenant with optional filters."""
-    # Count query
     count_q = select(func.count(Ticket.id)).where(Ticket.tenant_id == tenant_id)
     if status:
         count_q = count_q.where(Ticket.status == status)
@@ -62,7 +101,6 @@ async def list_tickets(
     total_result = await db.execute(count_q)
     total = total_result.scalar_one()
 
-    # Data query — latest triage decision joined
     q = (
         select(Ticket)
         .where(Ticket.tenant_id == tenant_id)
@@ -76,7 +114,6 @@ async def list_tickets(
     rows = await db.execute(q)
     tickets = rows.scalars().all()
 
-    # Fetch latest triage decision per ticket
     ticket_ids = [t.id for t in tickets]
     triage_map: dict[str, TriageDecision] = {}
     if ticket_ids:
@@ -92,7 +129,6 @@ async def list_tickets(
             if td.ticket_id not in triage_map:
                 triage_map[td.ticket_id] = td
 
-    # Apply module / priority filters (post-fetch on triage decisions)
     result_tickets = []
     for ticket in tickets:
         td = triage_map.get(ticket.id)

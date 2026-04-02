@@ -1,11 +1,12 @@
-import { useState, useRef, useCallback } from 'react';
-import { useIncidents, ChatMessage, Incident } from '@/context/IncidentContext';
+import { useState, useCallback } from 'react';
+import { useIncidents, ChatMessage, ticketToIncident } from '@/context/IncidentContext';
 import { ChatInput, SapContext } from '@/components/chat/ChatInput';
 import { ChatMessageList } from '@/components/chat/ChatMessageList';
 import { IncidentAnalysisPanel } from '@/components/chat/IncidentAnalysisPanel';
 import { Button } from '@/components/ui/button';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { api } from '@/services/api';
 
 export function ChatAssistantView() {
   const { state, createIncidentFromChat, addChatMessage, selectIncident, setFullScreen, getSelectedIncident } = useIncidents();
@@ -31,54 +32,93 @@ export function ChatAssistantView() {
       mediaUrl
     };
 
-    // Add to local state first for immediate feedback
     setLocalMessages(prev => [...prev, userMessage]);
     setIsProcessing(true);
 
-    // Simulate AI processing
-    setTimeout(() => {
+    try {
+      // Call the real triage API
+      const ticketResp = await api.createTicket({
+        source: 'chat',
+        raw_text: content,
+        reporter: undefined,
+      });
+
+      const incident = ticketToIncident(ticketResp);
+      // Attach media context from the chat input
+      if (mediaUrl) {
+        incident.hasMedia = true;
+        incident.mediaType = mediaType === 'text' ? undefined : mediaType;
+        incident.mediaUrl = mediaUrl;
+      }
+      if (sapContext?.tcode)       incident.tcode = sapContext.tcode;
+      if (sapContext?.errorCode)   incident.errorCode = sapContext.errorCode;
+      if (sapContext?.environment) incident.environment = sapContext.environment as 'PRD' | 'QAS' | 'DEV';
+      incident.chatHistory = [userMessage];
+
+      const triage = ticketResp.triage;
+      const aiText = triage
+        ? `Triaged as **${triage.module} / ${triage.priority}** (${Math.round(triage.confidence * 100)}% confidence).\n\n` +
+          `**Root cause:** ${triage.root_cause_hypothesis}\n\n` +
+          `**Solution:** ${triage.recommended_solution}\n\n` +
+          `**Assigned to:** ${triage.assign_to}` +
+          (triage.manual_review_required ? `\n\n⚠️ Manual review required: ${triage.review_reason}` : '')
+        : 'Ticket created — triage is pending.';
+
       const aiResponse: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
-        content: generateAIResponse(content, mediaType),
-        timestamp: new Date()
+        content: aiText,
+        timestamp: new Date(),
       };
-      
+
       setLocalMessages(prev => [...prev, aiResponse]);
-      
-      // If this is the first message, create an incident
+      incident.chatHistory = [userMessage, aiResponse];
+
+      // Add to context and select
+      createIncidentFromChat(incident);
+      setCurrentIncidentId(incident.id);
+      selectIncident(incident.id);
+
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      const errorResponse: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'assistant',
+        content: `Failed to triage ticket: ${errMsg}. Please check that the backend is running.`,
+        timestamp: new Date(),
+      };
+      setLocalMessages(prev => [...prev, errorResponse]);
+
+      // Fall back to local incident creation so the UI stays functional
       if (!currentIncidentId) {
-        const incident = createIncidentFromChat({
+        createIncidentFromChat({
           shortText: content.slice(0, 100),
           longText: content,
           hasMedia: !!mediaUrl,
           mediaType: mediaType === 'text' ? undefined : mediaType,
           mediaUrl,
-          issueType: detectIssueType(content),
-          severity: detectSeverity(content),
+          issueType: 'Technical Issue',
+          severity: 'P3',
           rootCause: 'Pending analysis',
-          suggestedTeam: detectTeam(content),
-          aiSummary: `Issue reported: ${content.slice(0, 150)}...`,
-          aiBullets: generateBullets(content),
-          aiRationale: 'Initial analysis based on user input',
-          aiSolution: generateSolution(content),
-          confidence: 75,
+          suggestedTeam: 'General SAP Support',
+          aiSummary: content.slice(0, 150),
+          aiBullets: ['Backend unavailable — manual triage required'],
+          aiRationale: 'Offline mode',
+          aiSolution: 'Please assign manually.',
+          confidence: 0,
           aiSource: 'llm',
-          chatHistory: [userMessage, aiResponse],
+          chatHistory: [userMessage, errorResponse],
           ...(sapContext?.tcode && { tcode: sapContext.tcode }),
           ...(sapContext?.environment && { environment: sapContext.environment as 'PRD' | 'QAS' | 'DEV' }),
-          ...(sapContext?.errorCode && { errorCode: sapContext.errorCode })
+          ...(sapContext?.errorCode && { errorCode: sapContext.errorCode }),
         });
-        setCurrentIncidentId(incident.id);
-        selectIncident(incident.id);
       } else {
-        // Add messages to existing incident
         addChatMessage(currentIncidentId, userMessage);
-        addChatMessage(currentIncidentId, aiResponse);
+        addChatMessage(currentIncidentId, errorResponse);
       }
-      
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   }, [currentIncidentId, createIncidentFromChat, addChatMessage, selectIncident]);
 
   const handleNewChat = useCallback(() => {
@@ -143,53 +183,3 @@ export function ChatAssistantView() {
   );
 }
 
-// Helper functions for AI simulation
-function generateAIResponse(content: string, mediaType?: string): string {
-  if (mediaType === 'audio') {
-    return "I've transcribed and analyzed your audio message. Based on the description, this appears to be a technical issue that requires immediate attention. I've created an incident record and populated the analysis panel with my findings. Please review the suggested Issue Type, Severity, and recommended team assignment on the right.";
-  }
-  if (mediaType === 'image') {
-    return "I've analyzed the uploaded image. Based on the error message visible, this appears to be a system configuration issue. I've documented my findings in the analysis panel. You can edit any of the fields before assigning to a team or pushing to external systems.";
-  }
-  return `I've analyzed your report. This appears to be a ${detectIssueType(content).toLowerCase()} that should be routed to the ${detectTeam(content)} team. My confidence level is 75% based on the information provided. You can review and modify my analysis in the panel on the right before taking any action.`;
-}
-
-function detectIssueType(content: string): string {
-  const lower = content.toLowerCase();
-  if (lower.includes('network') || lower.includes('connection')) return 'Network';
-  if (lower.includes('performance') || lower.includes('slow')) return 'Performance';
-  if (lower.includes('error') || lower.includes('crash')) return 'Technical Issue';
-  if (lower.includes('billing') || lower.includes('invoice')) return 'Billing Inquiry';
-  if (lower.includes('access') || lower.includes('login')) return 'Account Access';
-  return 'Technical Issue';
-}
-
-function detectSeverity(content: string): 'P1' | 'P2' | 'P3' | 'P4' {
-  const lower = content.toLowerCase();
-  if (lower.includes('critical') || lower.includes('down') || lower.includes('urgent')) return 'P1';
-  if (lower.includes('important') || lower.includes('blocking')) return 'P2';
-  if (lower.includes('minor') || lower.includes('low')) return 'P4';
-  return 'P3';
-}
-
-function detectTeam(content: string): string {
-  const lower = content.toLowerCase();
-  if (lower.includes('sap') || lower.includes('fi') || lower.includes('mm')) return 'SAP Support';
-  if (lower.includes('network')) return 'L2 Network';
-  if (lower.includes('server') || lower.includes('infra')) return 'L2 Infrastructure';
-  if (lower.includes('billing')) return 'Finance Team';
-  return 'L1 Support';
-}
-
-function generateBullets(content: string): string[] {
-  return [
-    'Issue reported via chat interface',
-    `Primary concern: ${content.slice(0, 50)}...`,
-    'Requires team review and validation',
-    'AI analysis pending human approval'
-  ];
-}
-
-function generateSolution(content: string): string {
-  return 'Pending detailed analysis. Please review the AI-generated suggestions and modify as needed before assigning to a resolution team.';
-}

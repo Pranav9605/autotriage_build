@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useCallback, ReactNode, useEffect } from 'react';
+import { api, TicketResponse } from '@/services/api';
+import { useSSE } from '@/hooks/useSSE';
 
 export type Priority = 'P1' | 'P2' | 'P3' | 'P4';
 export type Source = 'WhatsApp' | 'Jira' | 'Email' | 'Phone' | 'Chat' | 'SolMan' | 'PI_PO';
@@ -38,6 +40,7 @@ export interface Incident {
   similarTickets?: { id: string; match: number }[];
   notes: string[];
   chatHistory?: ChatMessage[];
+  decisionId?: string;   // backend triage_decision.id — used for feedback
 }
 
 export interface ChatMessage {
@@ -64,6 +67,99 @@ type IncidentAction =
   | { type: 'ADD_NOTE'; payload: { id: string; note: string } }
   | { type: 'ADD_CHAT_MESSAGE'; payload: { id: string; message: ChatMessage } }
   | { type: 'SET_INCIDENTS'; payload: Incident[] };
+
+// ---------------------------------------------------------------------------
+// Backend → Incident converter
+// ---------------------------------------------------------------------------
+
+const MODULE_TO_ISSUE_TYPE: Record<string, string> = {
+  FI: 'FI - Finance',
+  MM: 'MM - Materials',
+  SD: 'SD - Sales',
+  PP: 'PP - Production',
+  BASIS: 'BASIS - System',
+  ABAP: 'ABAP - Development',
+  PI_PO: 'PI_PO - Integration',
+  HR: 'HR - Human Resources',
+  CUSTOM: 'Technical Issue',
+};
+
+const SOURCE_MAP: Record<string, Source> = {
+  solman: 'SolMan',
+  whatsapp: 'WhatsApp',
+  chat: 'Chat',
+  email: 'Email',
+  jira: 'Jira',
+  phone: 'Phone',
+  pi_po: 'PI_PO',
+};
+
+function backendSourceToFrontend(source: string): Source {
+  return SOURCE_MAP[source.toLowerCase()] ?? 'Chat';
+}
+
+function backendStatusToFrontend(status: string): Status {
+  if (status === 'triaged') return 'In Progress';
+  if (status === 'resolved') return 'Resolved';
+  if (status === 'open') return 'New';
+  return 'New';
+}
+
+function getAge(createdAt: string): string {
+  const diffMs = Date.now() - new Date(createdAt).getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins}m`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h`;
+  return `${Math.floor(diffHrs / 24)}d`;
+}
+
+export function ticketToIncident(ticket: TicketResponse): Incident {
+  const t = ticket.triage;
+  const now = new Date();
+  return {
+    id: ticket.id,
+    shortText: ticket.description.slice(0, 120),
+    longText: ticket.description,
+    source: backendSourceToFrontend(ticket.source),
+    priority: (t?.priority ?? 'P3') as Priority,
+    status: backendStatusToFrontend(ticket.status),
+    issueType: MODULE_TO_ISSUE_TYPE[t?.module ?? ''] ?? 'Technical Issue',
+    severity: (t?.priority ?? 'P3') as Priority,
+    rootCause: t?.root_cause_hypothesis ?? '',
+    suggestedTeam: t?.assign_to ?? '',
+    assignedTeam: null,
+    sapModule: t?.module ?? '',
+    confidence: Math.round((t?.confidence ?? 0) * 100),
+    createdAt: new Date(ticket.created_at),
+    updatedAt: now,
+    age: getAge(ticket.created_at),
+    assignee: ticket.reporter ?? null,
+    hasMedia: false,
+    aiSummary: t?.root_cause_hypothesis ?? '',
+    aiBullets: t ? [
+      `Module: ${t.module}`,
+      `Priority: ${t.priority}`,
+      t.rules_applied?.length > 0 ? `Rules applied: ${t.rules_applied.join(', ')}` : null,
+      t.manual_review_required ? `Manual review required: ${t.review_reason ?? 'yes'}` : null,
+    ].filter(Boolean) as string[] : [],
+    aiRationale: `Confidence: ${Math.round((t?.confidence ?? 0) * 100)}% via ${t?.classification_source ?? 'unknown'}`,
+    aiSolution: t?.recommended_solution ?? '',
+    errorCode: ticket.error_code ?? undefined,
+    aiSource: (t?.classification_source === 'llm' ? 'llm' : t?.classification_source === 'error' ? 'llm' : 'llm') as AISource,
+    tcode: ticket.tcode ?? undefined,
+    environment: (ticket.environment as 'PRD' | 'QAS' | 'DEV' | undefined) ?? undefined,
+    manual_review_required: t?.manual_review_required ?? false,
+    similarTickets: t?.similar_ticket_ids?.map((id, i) => ({
+      id,
+      match: Math.round((t.similar_ticket_scores?.[i] ?? 0) * 100),
+    })) ?? [],
+    notes: [],
+    chatHistory: [],
+    // Store the decision_id so we can POST feedback later
+    decisionId: t?.decision_id,
+  } as Incident & { decisionId?: string };
+}
 
 const initialIncidents: Incident[] = [
   {
@@ -365,6 +461,7 @@ interface IncidentContextType {
   addChatMessage: (id: string, message: ChatMessage) => void;
   getSelectedIncident: () => Incident | null;
   createIncidentFromChat: (data: Partial<Incident>) => Incident;
+  loadIncidents: () => Promise<void>;
 }
 
 const IncidentContext = createContext<IncidentContextType | null>(null);
@@ -403,6 +500,35 @@ export function IncidentProvider({ children }: { children: ReactNode }) {
   const getSelectedIncident = useCallback(() => {
     return state.incidents.find(inc => inc.id === state.selectedIncidentId) || null;
   }, [state.incidents, state.selectedIncidentId]);
+
+  const loadIncidents = useCallback(async () => {
+    try {
+      const res = await api.listTickets({ page_size: 50 });
+      const incidents = res.tickets.map(ticketToIncident);
+      dispatch({ type: 'SET_INCIDENTS', payload: incidents });
+    } catch (err) {
+      console.warn('Failed to load incidents from backend — using mock data', err);
+    }
+  }, []);
+
+  // Load from backend on mount (silently falls back to mock data if offline)
+  useEffect(() => {
+    loadIncidents();
+  }, [loadIncidents]);
+
+  // Live updates via SSE — add newly triaged tickets to the top of the list
+  useSSE({
+    onTicketTriaged: useCallback(async (payload) => {
+      const ticketId = payload.ticket_id as string | undefined;
+      if (!ticketId) return;
+      try {
+        const ticket = await api.getTicket(ticketId);
+        dispatch({ type: 'ADD_INCIDENT', payload: ticketToIncident(ticket) });
+      } catch {
+        // ticket fetch failed — ignore
+      }
+    }, []),
+  });
 
   const createIncidentFromChat = useCallback((data: Partial<Incident>): Incident => {
     const id = `INC-${new Date().getFullYear()}-${String(state.incidents.length + 1).padStart(3, '0')}`;
@@ -457,7 +583,8 @@ export function IncidentProvider({ children }: { children: ReactNode }) {
       addNote,
       addChatMessage,
       getSelectedIncident,
-      createIncidentFromChat
+      createIncidentFromChat,
+      loadIncidents,
     }}>
       {children}
     </IncidentContext.Provider>

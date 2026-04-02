@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Incident, useIncidents } from '@/context/IncidentContext';
+import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,11 +10,10 @@ import { SourceTypeBadge } from '@/components/ui/SourceTypeBadge';
 import { SourceBadge } from '@/components/ui/SourceBadge';
 import { PriorityBadge } from '@/components/ui/PriorityBadge';
 import { ConfidenceIndicator } from '@/components/ui/ConfidenceIndicator';
-import { 
-  Check, 
-  Pencil, 
-  X, 
-  UserPlus, 
+import {
+  Check,
+  Pencil,
+  UserPlus,
   ExternalLink,
   Sparkles,
   Maximize2,
@@ -110,13 +110,23 @@ export function SupportConsolePanel() {
     }
   }, [incident, newNote, addNote, toast]);
 
-  const handleAccept = useCallback(() => {
+  const handleAccept = useCallback(async () => {
     if (incident) {
       const team = editedFields.suggestedTeam || incident.suggestedTeam;
-      updateIncident(incident.id, { 
+      updateIncident(incident.id, {
         status: 'In Progress',
         assignedTeam: team
       });
+      if (incident.decisionId) {
+        try {
+          await api.submitFeedback(incident.decisionId, {
+            action: 'accepted',
+            consultant_id: 'consultant',
+          });
+        } catch (err) {
+          console.warn('Feedback POST failed', err);
+        }
+      }
       toast({
         title: "Decision accepted",
         description: `Ticket assigned to ${team}.`

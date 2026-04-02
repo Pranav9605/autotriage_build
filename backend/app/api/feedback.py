@@ -9,6 +9,7 @@ from app.dependencies import get_db, get_tenant_id
 from app.models.feedback import Feedback
 from app.schemas.feedback import FeedbackCreate, FeedbackResponse
 from app.services.feedback_service import FeedbackService
+from app import sse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["feedback"])
@@ -29,7 +30,7 @@ async def create_feedback(
 ):
     """Record a consultant's accept/override decision on a triage result."""
     try:
-        return await _svc.create_feedback(
+        result = await _svc.create_feedback(
             db=db,
             triage_decision_id=triage_decision_id,
             feedback=body,
@@ -40,6 +41,14 @@ async def create_feedback(
         if isinstance(exc, TicketNotFoundError):
             raise HTTPException(status_code=404, detail=str(exc))
         raise
+
+    await sse.broadcast("feedback_received", {
+        "ticket_id": result.ticket_id,
+        "action": result.action,
+        "override_category": result.override_category,
+        "tenant_id": tenant_id,
+    })
+    return result
 
 
 @router.get("/api/v1/feedback", response_model=list[FeedbackResponse])

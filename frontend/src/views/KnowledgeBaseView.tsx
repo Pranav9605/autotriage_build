@@ -3,32 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PriorityBadge } from '@/components/ui/PriorityBadge';
 import { api, KBArticle } from '@/services/api';
-import { mapPriorityFromBackend, mapPriorityToBackend } from '@/utils/priorityMapping';
 import {
   BookOpen,
   Plus,
   Search,
-  Trash2,
   FileText,
   TrendingUp,
   Loader2,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
-import type { Priority } from '@/data/mockData';
 
-const CATEGORIES = [
-  'FI - Finance',
-  'MM - Materials',
-  'SD - Sales',
-  'BASIS - System',
-  'ABAP - Development',
-  'PI_PO - Integration',
-  'PP - Production'
-];
-
-const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
+const SAP_MODULES = ['FI', 'MM', 'SD', 'BASIS', 'ABAP', 'PI_PO', 'PP', 'HR', 'CUSTOM'];
 
 export function KnowledgeBaseView() {
   const [articles, setArticles] = useState<KBArticle[]>([]);
@@ -36,15 +22,14 @@ export function KnowledgeBaseView() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({ total_articles: 0, total_hits: 0 });
 
-  // Form state
   const [formData, setFormData] = useState({
     title: '',
-    problem: '',
-    solution: '',
-    category: CATEGORIES[0],
-    priority: PRIORITIES[2]
+    content: '',
+    module: SAP_MODULES[0],
+    error_codes: '',
+    tcodes: '',
+    tags: '',
   });
 
   const fetchArticles = async () => {
@@ -54,27 +39,15 @@ export function KnowledgeBaseView() {
       const data = await api.listKBArticles();
       setArticles(data);
     } catch (err) {
-      // Silently handle - backend may not be running
-      console.warn('KB articles fetch failed - backend may be offline');
+      console.warn('KB articles fetch failed — backend may be offline');
       setArticles([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const pipelineStats = await api.getPipelineStats();
-      setStats(pipelineStats.knowledge_base);
-    } catch (err) {
-      // Silently handle - show zeros if backend unavailable
-      console.warn('Pipeline stats fetch failed - backend may be offline');
-    }
-  };
-
   useEffect(() => {
     fetchArticles();
-    fetchStats();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,39 +55,21 @@ export function KnowledgeBaseView() {
     setIsSubmitting(true);
     setError(null);
     try {
-      await api.addKBArticle({
+      await api.createKBArticle({
         title: formData.title,
-        problem: formData.problem,
-        solution: formData.solution,
-        category: formData.category,
-        priority: formData.priority
+        content: formData.content,
+        module: formData.module,
+        error_codes: formData.error_codes ? formData.error_codes.split(',').map(s => s.trim()).filter(Boolean) : [],
+        tcodes: formData.tcodes ? formData.tcodes.split(',').map(s => s.trim()).filter(Boolean) : [],
+        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : [],
       });
-      setFormData({
-        title: '',
-        problem: '',
-        solution: '',
-        category: CATEGORIES[0],
-        priority: PRIORITIES[2]
-      });
+      setFormData({ title: '', content: '', module: SAP_MODULES[0], error_codes: '', tcodes: '', tags: '' });
       fetchArticles();
-      fetchStats();
     } catch (err) {
-      setError('Failed to add article');
+      setError('Failed to add article. Is the backend running?');
       console.error(err);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (articleId: string) => {
-    if (!articleId) return;
-    try {
-      await api.deleteKBArticle(articleId);
-      fetchArticles();
-      fetchStats();
-    } catch (err) {
-      setError('Failed to delete article');
-      console.error(err);
     }
   };
 
@@ -126,17 +81,15 @@ export function KnowledgeBaseView() {
     setIsLoading(true);
     setError(null);
     try {
-      const results = await api.searchKB(searchQuery);
-      setArticles(results);
+      const result = await api.searchKB(searchQuery);
+      setArticles(result.results);
     } catch (err) {
-      setError('Search failed');
+      setError('Search failed. Is the backend running?');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const filteredArticles = articles;
 
   return (
     <div className="p-6 space-y-6 max-w-6xl">
@@ -160,14 +113,16 @@ export function KnowledgeBaseView() {
             <FileText className="w-4 h-4" />
             Total Articles
           </div>
-          <p className="text-2xl font-bold mt-1">{stats.total_articles}</p>
+          <p className="text-2xl font-bold mt-1">{articles.length}</p>
         </div>
         <div className="kpi-card">
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <TrendingUp className="w-4 h-4" />
-            Total Hits
+            Modules Covered
           </div>
-          <p className="text-2xl font-bold mt-1">{stats.total_hits}</p>
+          <p className="text-2xl font-bold mt-1">
+            {new Set(articles.map(a => a.module)).size}
+          </p>
         </div>
       </div>
 
@@ -193,79 +148,74 @@ export function KnowledgeBaseView() {
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Enter article title..."
+                placeholder="e.g. FB50 Posting Error F5 301"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="problem">Problem Description</Label>
+              <Label htmlFor="content">Content</Label>
               <Textarea
-                id="problem"
-                value={formData.problem}
-                onChange={(e) => setFormData({ ...formData, problem: e.target.value })}
-                placeholder="Describe the problem (used for semantic matching)..."
-                rows={3}
-                required
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                This text is used for semantic matching when tickets come in
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="solution">Solution</Label>
-              <Textarea
-                id="solution"
-                value={formData.solution}
-                onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
-                placeholder="Describe the solution..."
-                rows={3}
+                id="content"
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                placeholder="Problem description and solution steps (used for semantic matching)..."
+                rows={4}
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="module">SAP Module</Label>
                 <select
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  id="module"
+                  value={formData.module}
+                  onChange={(e) => setFormData({ ...formData, module: e.target.value })}
                   className="w-full mt-1 px-3 py-2 border border-border rounded-md text-sm bg-background"
                 >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {SAP_MODULES.map((m) => (
+                    <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
               </div>
-
               <div>
-                <Label htmlFor="priority">Priority</Label>
-                <select
-                  id="priority"
-                  value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-border rounded-md text-sm bg-background"
-                >
-                  {PRIORITIES.map((pri) => (
-                    <option key={pri} value={pri}>{pri}</option>
-                  ))}
-                </select>
+                <Label htmlFor="error_codes">Error Codes</Label>
+                <Input
+                  id="error_codes"
+                  value={formData.error_codes}
+                  onChange={(e) => setFormData({ ...formData, error_codes: e.target.value })}
+                  placeholder="F5 301, M7 021 (comma-sep)"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="tcodes">T-Codes</Label>
+                <Input
+                  id="tcodes"
+                  value={formData.tcodes}
+                  onChange={(e) => setFormData({ ...formData, tcodes: e.target.value })}
+                  placeholder="FB50, ME21N (comma-sep)"
+                />
+              </div>
+              <div>
+                <Label htmlFor="tags">Tags</Label>
+                <Input
+                  id="tags"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  placeholder="posting, fi, gl (comma-sep)"
+                />
               </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Adding...
-                </>
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Adding...</>
               ) : (
-                <>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Article
-                </>
+                <><Plus className="w-4 h-4 mr-2" />Add Article</>
               )}
             </Button>
           </form>
@@ -278,7 +228,6 @@ export function KnowledgeBaseView() {
             <h2>Articles</h2>
           </div>
 
-          {/* Search */}
           <div className="flex gap-2 mb-4">
             <Input
               placeholder="Search articles..."
@@ -291,46 +240,47 @@ export function KnowledgeBaseView() {
             </Button>
           </div>
 
-          {/* List */}
           <div className="space-y-2 max-h-[500px] overflow-y-auto">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
-            ) : filteredArticles.length === 0 ? (
+            ) : articles.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No articles found
               </div>
             ) : (
-              filteredArticles.map((article) => (
+              articles.map((article) => (
                 <div
-                  key={article.article_id}
+                  key={article.id}
                   className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-medium text-sm truncate">{article.title}</h4>
-                        <PriorityBadge 
-                          priority={mapPriorityFromBackend(article.priority) as Priority} 
-                          size="sm" 
-                        />
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded shrink-0">
+                          {article.module}
+                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
-                        {article.problem}
+                        {article.content}
                       </p>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                        {article.category}
-                      </span>
+                      {(article.error_codes?.length > 0 || article.tcodes?.length > 0) && (
+                        <div className="flex gap-1 flex-wrap">
+                          {article.error_codes?.slice(0, 2).map(ec => (
+                            <span key={ec} className="text-xs bg-destructive/10 text-destructive px-1.5 py-0.5 rounded font-mono">
+                              {ec}
+                            </span>
+                          ))}
+                          {article.tcodes?.slice(0, 2).map(tc => (
+                            <span key={tc} className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">
+                              {tc}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => article.article_id && handleDelete(article.article_id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
               ))
